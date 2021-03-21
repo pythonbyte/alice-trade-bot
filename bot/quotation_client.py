@@ -1,7 +1,11 @@
+"""File responsible for having the logic for retrieving the stock quotation values."""
 import datetime
 import json
 import requests
 import os
+import sys
+
+from typing import Optional, Tuple
 
 
 HEADERS = {'Content-Type': 'application/json',
@@ -9,7 +13,8 @@ HEADERS = {'Content-Type': 'application/json',
 
 
 def login() -> requests.Session:
-    url = os.environ.get('QUOTATION_LOGIN_URL')
+    """Function responsible to login and create session for get quotation api."""
+    url = os.environ.get('QUOTATION_LOGIN_URL', '')
     payload =  json.dumps({
         'username': os.environ.get('QUOTATION_USERNAME'),
         'password': os.environ.get('QUOTATION_PASSWORD'),
@@ -26,8 +31,18 @@ def login() -> requests.Session:
     return session
 
 
-def get_quotation(paper: str, size: int = 10, session=None) -> (requests.Response, requests.Session):
-    url = os.environ.get('QUOTATION_URL')
+def get_quotation(
+        paper: str,
+        size: int = 10,
+        session: Optional[requests.Session] = None
+    ) -> Tuple[requests.Response, requests.Session]:
+    """
+    Function responsible for getting the stock quotation.
+
+    It will send the payload with the stock paper and return a response
+    and a session for future use.
+    """
+    url = os.environ.get('QUOTATION_URL', '')
     payload = json.dumps({
         'annotations': False,
         'count': size,
@@ -47,12 +62,13 @@ def get_quotation(paper: str, size: int = 10, session=None) -> (requests.Respons
     return response, session
 
 
-def test_client():
+def test_client(stock_paper: str = '') -> None:
+    """A simple test function to pull the data from the API."""
     while datetime.datetime.now().second != 2:
-        response, session = get_quotation('WINJ21')
+        response, session = get_quotation(stock_paper)
         print(response.json()['result']['candles'][0]['vl_close'])
         break
 
 
 if __name__ == '__main__':
-    test_client()
+    test_client(stock_paper=sys.argv[1])
