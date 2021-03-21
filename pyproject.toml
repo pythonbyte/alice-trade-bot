@@ -8,6 +8,7 @@ authors = ["Eduardo <pythonbyte>"]
 python = "^3.9"
 requests = "^2.25.1"
 mypy = "^0.812"
+selenium = "^3.141.0"
 
 [tool.poetry.dev-dependencies]
 
